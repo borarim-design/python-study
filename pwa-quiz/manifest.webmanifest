@@ -1,7 +1,7 @@
 {
-  "name": "파이썬 학습 퀴즈",
-  "short_name": "Py 퀴즈",
-  "description": "AI Python for Beginners + FDE 브릿지 자가진단 퀴즈",
+  "name": "보라야 장학금 타자",
+  "short_name": "장학금타자",
+  "description": "AI Python for Beginners + FDE 브릿지 학습 앱",
   "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",

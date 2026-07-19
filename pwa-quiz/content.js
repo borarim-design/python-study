@@ -205,3 +205,22 @@ window.QUIZ_CONTENT = [
     ]
   }
 ];
+
+/* =====================================================================
+   강의 루틴 콘텐츠
+   ---------------------------------------------------------------------
+   강의를 추가하려면 items 배열에 { ... }를 넣으세요.
+     id:    시청 체크 저장용 고유 id (겹치지 않게)
+     title: 강의 제목
+     desc:  한 줄 설명
+     url:   (선택) 이 강의만의 주소. 없으면 courseUrl로 이동
+   ===================================================================== */
+window.QUIZ_LECTURES = {
+  courseUrl: "https://www.deeplearning.ai/courses/ai-python-for-beginners",
+  items: [
+    { id:"l1", title:"파트 1 · 파이썬 기초", desc:"변수 · 자료형 · f-string · 함수" },
+    { id:"l2", title:"파트 2 · 자동화", desc:"리스트 · 반복문 · 딕셔너리" },
+    { id:"l3", title:"파트 3 · 내 데이터·파일", desc:"파일 읽기·쓰기 · CSV" },
+    { id:"l4", title:"파트 4 · 패키지 & API", desc:"import · requests · JSON" }
+  ]
+};

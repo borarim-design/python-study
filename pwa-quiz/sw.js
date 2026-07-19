@@ -3,7 +3,7 @@
    - 푸시 수신 → 알림 표시 (단, 오늘 이미 학습했으면 건너뜀)
    - 알림 클릭 → 앱 열기
 */
-const CACHE = "pyquiz-v2";
+const CACHE = "pyquiz-v3";
 const ASSETS = [
   "./", "./index.html", "./content.js", "./manifest.webmanifest",
   "./icons/icon-192.png", "./icons/icon-512.png",

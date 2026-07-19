@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<title>파이썬 학습 퀴즈</title>
+<title>보라야 장학금 타자</title>
 <meta name="theme-color" content="#7c3aed">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="icons/icon-192.png">
@@ -127,6 +127,39 @@ footer { text-align: center; color: #9ca3af; font-size: 12px; margin-top: 26px; 
 .subbox { margin-top:12px; }
 .subbox textarea { width:100%; height:88px; font-family:"SF Mono",Menlo,monospace; font-size:11px;
   border:1.5px solid #e6e8ec; border-radius:10px; padding:10px; color:#374151; }
+
+/* 강의 루틴 */
+.lec-card {
+  margin-top:14px; background:linear-gradient(135deg,#faf5ff,#eef2ff);
+  border:1px solid #e4d8f7; border-radius:14px; padding:16px 18px; cursor:pointer;
+  display:flex; align-items:center; justify-content:space-between; gap:14px;
+  transition:box-shadow .15s, transform .05s;
+}
+.lec-card:hover { box-shadow:0 4px 16px rgba(124,58,237,.12); }
+.lec-card:active { transform:translateY(1px); }
+.lec-card .meta .title { font-size:15.5px; font-weight:650; }
+.lec-card .meta .desc { font-size:12.5px; color:#6b7280; margin-top:3px; }
+.lec-card .score .big { font-size:18px; font-weight:700; color:#7c3aed; }
+.lec-card .score .lbl { font-size:11px; color:#9ca3af; text-align:right; }
+.lec-item {
+  display:flex; align-items:center; gap:12px; padding:14px 4px; border-bottom:1px solid #eef0f3;
+}
+.lec-item:last-child { border-bottom:none; }
+.lec-check {
+  width:26px; height:26px; border-radius:8px; border:2px solid #cbd0d8; background:#fff;
+  flex-shrink:0; cursor:pointer; display:flex; align-items:center; justify-content:center;
+  font-size:15px; color:#fff; transition:all .12s;
+}
+.lec-check.on { background:#7c3aed; border-color:#7c3aed; }
+.lec-body { flex:1; min-width:0; cursor:pointer; }
+.lec-body .t { font-size:14.5px; font-weight:600; }
+.lec-body .t.done { text-decoration:line-through; color:#9ca3af; }
+.lec-body .d { font-size:12px; color:#9ca3af; margin-top:2px; }
+.lec-go {
+  flex-shrink:0; background:#7c3aed; color:#fff; border:none; border-radius:9px;
+  padding:8px 13px; font-size:13px; font-weight:650; cursor:pointer; font-family:inherit; text-decoration:none; white-space:nowrap;
+}
+.lec-go:hover { background:#6d28d9; }
 </style>
 </head>
 <body>
@@ -135,7 +168,7 @@ footer { text-align: center; color: #9ca3af; font-size: 12px; margin-top: 26px; 
   <!-- DASHBOARD -->
   <div id="dashboard">
     <header class="top">
-      <h1>파이썬 학습 퀴즈 🐍</h1>
+      <h1>보라야 장학금 타자 🐍</h1>
       <div class="sub">AI Python for Beginners + FDE 브릿지</div>
       <div class="row">
         <span class="chip" id="streakChip">🔥 오늘 시작해보세요</span>
@@ -143,7 +176,8 @@ footer { text-align: center; color: #9ca3af; font-size: 12px; margin-top: 26px; 
         <button class="mini-btn hidden" id="installBtn">⬇️ 앱 설치</button>
       </div>
     </header>
-    <div class="grid" id="sectionGrid"></div>
+    <div class="lec-card" id="lectureCard"></div>
+    <div class="grid" id="sectionGrid" style="margin-top:14px;"></div>
     <div class="add-card" id="addCard" style="margin-top:12px;">＋ 내 문제 추가하기</div>
     <footer>
       풀 때마다 최고 점수·연속일이 저장돼요 · <button class="reset-all" id="resetBtn">기록 초기화</button>
@@ -198,6 +232,17 @@ footer { text-align: center; color: #9ca3af; font-size: 12px; margin-top: 26px; 
     </div>
   </div>
 
+  <!-- LECTURES -->
+  <div id="lecturesView" class="hidden">
+    <div class="qhead"><button class="back" id="backBtn5">← 목록으로</button><span class="progress-txt">강의 루틴</span></div>
+    <div class="panel">
+      <div class="qtext" style="font-size:16px;">📺 AI Python for Beginners</div>
+      <p class="hint" style="margin-top:8px;">강의를 보고 파트별로 "시청 완료"에 체크하세요. 체크하면 오늘 학습으로도 인정돼 밤 9시 알림을 건너뜁니다.</p>
+      <a class="btn" id="goCourse" style="margin-top:14px; display:block; text-align:center; text-decoration:none;" target="_blank" rel="noopener">▶ 전체 강의 보러가기</a>
+      <div id="lecList" style="margin-top:6px;"></div>
+    </div>
+  </div>
+
 </div>
 <div class="toast" id="toast"></div>
 
@@ -241,6 +286,7 @@ let SECTIONS=buildSections();
 // ====== 대시보드 ======
 function renderDashboard(){
   SECTIONS=buildSections();
+  renderLectureCard();
   const streak=store.streak||0;
   $("streakChip").textContent = streak>0 ? `🔥 ${streak}일 연속!` : "🔥 오늘 시작해보세요";
   const grid=$("sectionGrid"); grid.innerHTML="";
@@ -260,7 +306,7 @@ function renderDashboard(){
 
 // ====== 퀴즈 흐름 ======
 let cur=null;
-function show(view){ ["dashboard","quiz","resultView","addView","notifyView"].forEach(v=>$(v).classList.toggle("hidden",v!==view)); }
+function show(view){ ["dashboard","quiz","resultView","addView","notifyView","lecturesView"].forEach(v=>$(v).classList.toggle("hidden",v!==view)); }
 function startQuiz(secId){
   const sec=SECTIONS.find(s=>s.id===secId); if(!sec||!sec.questions.length){ toast("문제가 없어요"); return; }
   cur={sec,idx:0,correct:0,answered:false}; show("quiz"); renderQuestion();
@@ -370,9 +416,53 @@ window.addEventListener("beforeinstallprompt",e=>{ e.preventDefault(); deferredP
 $("installBtn").onclick=async()=>{ if(!deferredPrompt)return; deferredPrompt.prompt(); await deferredPrompt.userChoice; deferredPrompt=null; $("installBtn").classList.add("hidden"); };
 window.addEventListener("appinstalled",()=>$("installBtn").classList.add("hidden"));
 
+// ====== 강의 루틴 ======
+const LECTURES = window.QUIZ_LECTURES || { courseUrl:"", items:[] };
+function lecUrl(item){ return item.url || LECTURES.courseUrl || "#"; }
+function renderLectureCard(){
+  const items=LECTURES.items||[]; if(!items.length){ $("lectureCard").style.display="none"; return; }
+  $("lectureCard").style.display="flex";
+  const watched=store.lectures||{}; const done=items.filter(i=>watched[i.id]).length;
+  $("lectureCard").innerHTML=`
+    <div class="meta"><div class="title">📺 강의 루틴</div>
+      <div class="desc">강의 보고 파트별로 시청 체크하기</div></div>
+    <div class="score"><div class="big">${done}/${items.length}</div><div class="lbl">시청 완료</div></div>`;
+}
+function openLectures(){
+  $("goCourse").href=LECTURES.courseUrl||"#";
+  show("lecturesView"); renderLectures();
+}
+function renderLectures(){
+  const items=LECTURES.items||[]; const watched=store.lectures||{};
+  const box=$("lecList"); box.innerHTML="";
+  items.forEach(item=>{
+    const on=!!watched[item.id];
+    const row=document.createElement("div"); row.className="lec-item";
+    row.innerHTML=`
+      <div class="lec-check ${on?'on':''}" data-id="${item.id}">${on?'✓':''}</div>
+      <div class="lec-body" data-id="${item.id}">
+        <div class="t ${on?'done':''}">${esc(item.title)}</div>
+        <div class="d">${esc(item.desc||'')}</div>
+      </div>
+      <a class="lec-go" href="${esc(lecUrl(item))}" target="_blank" rel="noopener">▶ 보기</a>`;
+    row.querySelector(".lec-check").onclick=()=>toggleLecture(item.id);
+    row.querySelector(".lec-body").onclick=()=>toggleLecture(item.id);
+    box.appendChild(row);
+  });
+}
+function toggleLecture(id){
+  store.lectures=store.lectures||{};
+  const now=!store.lectures[id];
+  if(now) store.lectures[id]=true; else delete store.lectures[id];
+  saveStore(store);
+  if(now){ markStudiedToday(); toast("시청 완료로 표시했어요 ✅"); }
+  renderLectures();
+}
+
 // ====== 네비게이션 ======
-$("backBtn").onclick=goHome; $("backBtn3").onclick=goHome; $("backBtn4").onclick=goHome;
+$("backBtn").onclick=goHome; $("backBtn3").onclick=goHome; $("backBtn4").onclick=goHome; $("backBtn5").onclick=goHome;
 $("addCard").onclick=openAdd;
+$("lectureCard").onclick=openLectures;
 $("notifyBtn").onclick=()=>show("notifyView");
 $("resetBtn").onclick=()=>{ if(confirm("모든 학습 기록을 지울까요? (추가한 문제는 유지돼요)")){ store={}; saveStore(store); renderDashboard(); } };
 
