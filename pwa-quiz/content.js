@@ -207,20 +207,87 @@ window.QUIZ_CONTENT = [
 ];
 
 /* =====================================================================
-   강의 루틴 콘텐츠
+   강의 루틴 콘텐츠 (모듈 → 레슨 구조)
    ---------------------------------------------------------------------
-   강의를 추가하려면 items 배열에 { ... }를 넣으세요.
-     id:    시청 체크 저장용 고유 id (겹치지 않게)
-     title: 강의 제목
-     desc:  한 줄 설명
-     url:   (선택) 이 강의만의 주소. 없으면 courseUrl로 이동
+   모듈을 추가하려면 modules 배열에 { id, title, lessons:[...] }를 넣으세요.
+   레슨 스키마:
+     { id:"고유id", title:"레슨 제목", tag:"영상|읽기|퀴즈|실습|영상+코드", min:"7m", url:"레슨 주소" }
+   - id는 시청 체크 저장용이라 겹치면 안 돼요.
+   - url이 없으면 courseUrl(전체 강의)로 이동합니다.
    ===================================================================== */
 window.QUIZ_LECTURES = {
-  courseUrl: "https://www.deeplearning.ai/courses/ai-python-for-beginners",
-  items: [
-    { id:"l1", title:"파트 1 · 파이썬 기초", desc:"변수 · 자료형 · f-string · 함수" },
-    { id:"l2", title:"파트 2 · 자동화", desc:"리스트 · 반복문 · 딕셔너리" },
-    { id:"l3", title:"파트 3 · 내 데이터·파일", desc:"파일 읽기·쓰기 · CSV" },
-    { id:"l4", title:"파트 4 · 패키지 & API", desc:"import · requests · JSON" }
+  courseUrl: "https://learn.deeplearning.ai/courses/ai-python-for-beginners",
+  modules: [
+    {
+      id: "m1", title: "Module 1 · 파이썬 기초",
+      lessons: [
+        { id:"m1_01", title:"Introduction", tag:"영상", min:"3m", url:"https://learn.deeplearning.ai/courses/ai-python-for-beginners/lesson/z57gn/introduction" },
+        { id:"m1_02", title:"What is computer programming?", tag:"영상", min:"5m", url:"https://learn.deeplearning.ai/courses/ai-python-for-beginners/lesson/fq15s/what-is-computer-programming%3F" },
+        { id:"m1_03", title:"Writing code with chatbots", tag:"영상", min:"6m", url:"https://learn.deeplearning.ai/courses/ai-python-for-beginners/lesson/tcasp/writing-code-with-chatbots" },
+        { id:"m1_04", title:"Navigating the learning platform", tag:"영상", min:"3m", url:"https://learn.deeplearning.ai/courses/ai-python-for-beginners/lesson/xsm1m/navigating-the-learning-platform" },
+        { id:"m1_05", title:"Join the DeepLearning.AI Forum", tag:"읽기", min:"1m", url:"https://learn.deeplearning.ai/courses/ai-python-for-beginners/lesson/a0n1f3/join-the-deeplearning.ai-forum-to-ask-questions%2C-get-support%2C-or-share-amazing-ideas!" },
+        { id:"m1_06", title:"Running your first program", tag:"영상+코드", min:"8m", url:"https://learn.deeplearning.ai/courses/ai-python-for-beginners/lesson/fkmqy/running-your-first-program" },
+        { id:"m1_07", title:"How to succeed in coding", tag:"영상", min:"2m", url:"https://learn.deeplearning.ai/courses/ai-python-for-beginners/lesson/rgkn7/how-to-succeed-in-coding" },
+        { id:"m1_08", title:"Data in Python", tag:"영상+코드", min:"10m", url:"https://learn.deeplearning.ai/courses/ai-python-for-beginners/lesson/oa6j1/data-in-python" },
+        { id:"m1_09", title:"Combining text and calculations", tag:"영상+코드", min:"7m", url:"https://learn.deeplearning.ai/courses/ai-python-for-beginners/lesson/lom1m/combining-text-and-calculations" },
+        { id:"m1_10", title:"Variables", tag:"영상+코드", min:"7m", url:"https://learn.deeplearning.ai/courses/ai-python-for-beginners/lesson/jtflj/variables" },
+        { id:"m1_11", title:"Building LLM prompts with variables", tag:"영상+코드", min:"4m", url:"https://learn.deeplearning.ai/courses/ai-python-for-beginners/lesson/xlvo7/building-llm-prompts-with-variables" },
+        { id:"m1_12", title:"Functions: Actions on Data", tag:"영상+코드", min:"7m", url:"https://learn.deeplearning.ai/courses/ai-python-for-beginners/lesson/reh6e/functions%3A-actions-on-data" },
+        { id:"m1_13", title:"Quiz 1", tag:"퀴즈", min:"10m", url:"https://learn.deeplearning.ai/courses/ai-python-for-beginners/lesson/v282q/quiz-1" },
+        { id:"m1_14", title:"Working with a Virtual Library", tag:"실습", min:"1h30m", url:"https://learn.deeplearning.ai/courses/ai-python-for-beginners/lesson/var01/working-with-a-virtual-library" },
+        { id:"m1_15", title:"Lecture Notes M1", tag:"읽기", min:"1m", url:"https://learn.deeplearning.ai/courses/ai-python-for-beginners/lesson/hesjqh/lecture-notes-m1" }
+      ]
+    },
+    {
+      id: "m2", title: "Module 2 · 자동화",
+      lessons: [
+        { id:"m2_01", title:"Introduction", tag:"영상", min:"3m", url:"https://learn.deeplearning.ai/courses/ai-python-for-beginners/lesson/xkdnj/introduction" },
+        { id:"m2_02", title:"Completing a task list with AI", tag:"영상+코드", min:"13m", url:"https://learn.deeplearning.ai/courses/ai-python-for-beginners/lesson/eu7qk/completing-a-task-list-with-ai" },
+        { id:"m2_03", title:"Repeating tasks with for loops", tag:"영상+코드", min:"12m", url:"https://learn.deeplearning.ai/courses/ai-python-for-beginners/lesson/rmhdb/repeating-tasks-with-for-loops" },
+        { id:"m2_04", title:"Prioritizing tasks with dictionaries and AI", tag:"영상+코드", min:"14m", url:"https://learn.deeplearning.ai/courses/ai-python-for-beginners/lesson/lg0k9/prioritizing-tasks-with-dictionaries-and-ai" },
+        { id:"m2_05", title:"Customizing recipes with lists, dictionaries and AI", tag:"영상+코드", min:"6m", url:"https://learn.deeplearning.ai/courses/ai-python-for-beginners/lesson/wcxdt/customizing-recipes-with-lists%2C-dictionaries-and-ai" },
+        { id:"m2_06", title:"Comparing data in Python", tag:"영상+코드", min:"11m", url:"https://learn.deeplearning.ai/courses/ai-python-for-beginners/lesson/bpndp/comparing-data-in-python" },
+        { id:"m2_07", title:"Helping AI make decisions", tag:"영상+코드", min:"10m", url:"https://learn.deeplearning.ai/courses/ai-python-for-beginners/lesson/gx4st/helping-ai-make-decisions" },
+        { id:"m2_08", title:"Quiz 2", tag:"퀴즈", min:"10m", url:"https://learn.deeplearning.ai/courses/ai-python-for-beginners/lesson/gz6j5/quiz-2" },
+        { id:"m2_09", title:"Next course preview: working with files", tag:"영상+코드", min:"4m", url:"https://learn.deeplearning.ai/courses/ai-python-for-beginners/lesson/hn9wt/next-course-preview%3A-working-with-files" },
+        { id:"m2_10", title:"Book Tracker", tag:"실습", min:"1h30m", url:"https://learn.deeplearning.ai/courses/ai-python-for-beginners/lesson/var02/book-tracker" },
+        { id:"m2_11", title:"Lecture Notes M2", tag:"읽기", min:"1m", url:"https://learn.deeplearning.ai/courses/ai-python-for-beginners/lesson/4ka52n/lecture-notes-m2" }
+      ]
+    },
+    {
+      id: "m3", title: "Module 3 · 내 데이터·파일",
+      lessons: [
+        { id:"m3_01", title:"Introduction", tag:"영상", min:"4m", url:"https://learn.deeplearning.ai/courses/ai-python-for-beginners/lesson/cu8ww/introduction" },
+        { id:"m3_02", title:"Using files in Python", tag:"영상+코드", min:"5m", url:"https://learn.deeplearning.ai/courses/ai-python-for-beginners/lesson/a2vwh/using-files-in-python" },
+        { id:"m3_03", title:"Loading and using your own data", tag:"영상+코드", min:"6m", url:"https://learn.deeplearning.ai/courses/ai-python-for-beginners/lesson/z6p78/loading-and-using-your-own-data" },
+        { id:"m3_04", title:"Reading journals from food critics", tag:"영상+코드", min:"7m", url:"https://learn.deeplearning.ai/courses/ai-python-for-beginners/lesson/fcn4o/reading-journals-from-food-critics" },
+        { id:"m3_05", title:"Extracting restaurant information from journal entries", tag:"영상+코드", min:"8m", url:"https://learn.deeplearning.ai/courses/ai-python-for-beginners/lesson/x5zu6/extracting-restaurant-information-from-journal-entries" },
+        { id:"m3_06", title:"Vacation planning using CSV files", tag:"영상+코드", min:"7m", url:"https://learn.deeplearning.ai/courses/ai-python-for-beginners/lesson/jz515/vacation-planning-using-csv-files" },
+        { id:"m3_07", title:"Turning code blocks into reusable functions", tag:"영상+코드", min:"8m", url:"https://learn.deeplearning.ai/courses/ai-python-for-beginners/lesson/vvkwa/turning-code-blocks-into-reusable-functions" },
+        { id:"m3_08", title:"Creating detailed itineraries for multiple cities", tag:"영상+코드", min:"8m", url:"https://learn.deeplearning.ai/courses/ai-python-for-beginners/lesson/fvhf6/creating-detailed-itineraries-for-multiple-cities" },
+        { id:"m3_09", title:"Share Your Learning Project!", tag:"자료", min:"10m", url:"https://learn.deeplearning.ai/courses/ai-python-for-beginners/lesson/vkbbe/share-your-learning-project!" },
+        { id:"m3_10", title:"Quiz 3", tag:"퀴즈", min:"10m", url:"https://learn.deeplearning.ai/courses/ai-python-for-beginners/lesson/t1gbe/quiz-3" },
+        { id:"m3_11", title:"Pluto's Poetic Journey", tag:"실습", min:"1h30m", url:"https://learn.deeplearning.ai/courses/ai-python-for-beginners/lesson/var03/pluto's-poetic-journey" },
+        { id:"m3_12", title:"Lecture Notes M3", tag:"읽기", min:"1m", url:"https://learn.deeplearning.ai/courses/ai-python-for-beginners/lesson/rpwgmj/lecture-notes-m3" }
+      ]
+    },
+    {
+      id: "m4", title: "Module 4 · 패키지 & API",
+      lessons: [
+        { id:"m4_01", title:"Introduction", tag:"영상", min:"3m", url:"https://learn.deeplearning.ai/courses/ai-python-for-beginners/lesson/jf9wj/introduction" },
+        { id:"m4_02", title:"Using functions from a local file", tag:"영상+코드", min:"7m", url:"https://learn.deeplearning.ai/courses/ai-python-for-beginners/lesson/dg744/using-functions-from-a-local-file" },
+        { id:"m4_03", title:"Built-in packages", tag:"영상+코드", min:"8m", url:"https://learn.deeplearning.ai/courses/ai-python-for-beginners/lesson/fzga4/built-in-packages" },
+        { id:"m4_04", title:"Using third-party packages", tag:"영상+코드", min:"8m", url:"https://learn.deeplearning.ai/courses/ai-python-for-beginners/lesson/qxp4e/using-third-party-packages" },
+        { id:"m4_05", title:"Installing packages", tag:"영상+코드", min:"8m", url:"https://learn.deeplearning.ai/courses/ai-python-for-beginners/lesson/nysnl/installing-packages" },
+        { id:"m4_06", title:"APIs to get data from the web", tag:"영상+코드", min:"7m", url:"https://learn.deeplearning.ai/courses/ai-python-for-beginners/lesson/eqtmw/apis-to-get-data-from-the-web" },
+        { id:"m4_07", title:"APIs to use AI models", tag:"영상+코드", min:"9m", url:"https://learn.deeplearning.ai/courses/ai-python-for-beginners/lesson/dsacv/apis-to-use-ai-models" },
+        { id:"m4_08", title:"Install Python on your computer", tag:"코드", min:"10m", url:"https://learn.deeplearning.ai/courses/ai-python-for-beginners/lesson/t00y7/install-python-on-your-computer" },
+        { id:"m4_09", title:"Conclusion", tag:"영상", min:"3m", url:"https://learn.deeplearning.ai/courses/ai-python-for-beginners/lesson/bj5sb/conclusion" },
+        { id:"m4_10", title:"Quiz 4", tag:"퀴즈", min:"10m", url:"https://learn.deeplearning.ai/courses/ai-python-for-beginners/lesson/zez8g/quiz-4" },
+        { id:"m4_11", title:"Share Your Learning Project!", tag:"자료", min:"10m", url:"https://learn.deeplearning.ai/courses/ai-python-for-beginners/lesson/v5ysp/share-your-learning-project!" },
+        { id:"m4_12", title:"Candy Analysis", tag:"실습", min:"1h30m", url:"https://learn.deeplearning.ai/courses/ai-python-for-beginners/lesson/var04/candy-analysis" },
+        { id:"m4_13", title:"Lecture Notes M4", tag:"읽기", min:"1m", url:"https://learn.deeplearning.ai/courses/ai-python-for-beginners/lesson/0f6sku/lecture-notes-m4" }
+      ]
+    }
   ]
 };

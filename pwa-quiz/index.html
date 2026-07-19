@@ -160,6 +160,20 @@ footer { text-align: center; color: #9ca3af; font-size: 12px; margin-top: 26px; 
   padding:8px 13px; font-size:13px; font-weight:650; cursor:pointer; font-family:inherit; text-decoration:none; white-space:nowrap;
 }
 .lec-go:hover { background:#6d28d9; }
+.lec-mod {
+  display:flex; align-items:center; justify-content:space-between; gap:10px; cursor:pointer;
+  padding:14px 4px 10px; margin-top:6px; border-top:2px solid #f0eef6;
+}
+.lec-mod:first-child { border-top:none; margin-top:0; }
+.lec-mod .mt { font-size:14px; font-weight:700; color:#4c1d95; }
+.lec-mod .mr { font-size:12px; color:#9ca3af; display:flex; align-items:center; gap:8px; }
+.lec-mod .arrow { transition:transform .15s; display:inline-block; }
+.lec-mod.open .arrow { transform:rotate(90deg); }
+.lec-tag {
+  display:inline-block; font-size:10.5px; font-weight:700; color:#7c3aed; background:#f3ebff;
+  border-radius:5px; padding:1px 6px; margin-right:6px; vertical-align:middle;
+}
+.lec-min { font-size:11px; color:#b0b4bd; }
 </style>
 </head>
 <body>
@@ -416,38 +430,55 @@ window.addEventListener("beforeinstallprompt",e=>{ e.preventDefault(); deferredP
 $("installBtn").onclick=async()=>{ if(!deferredPrompt)return; deferredPrompt.prompt(); await deferredPrompt.userChoice; deferredPrompt=null; $("installBtn").classList.add("hidden"); };
 window.addEventListener("appinstalled",()=>$("installBtn").classList.add("hidden"));
 
-// ====== 강의 루틴 ======
-const LECTURES = window.QUIZ_LECTURES || { courseUrl:"", items:[] };
-function lecUrl(item){ return item.url || LECTURES.courseUrl || "#"; }
+// ====== 강의 루틴 (모듈 → 레슨) ======
+const LECTURES = window.QUIZ_LECTURES || { courseUrl:"", modules:[] };
+const LEC_MODULES = LECTURES.modules || [];
+let lecOpen = {}; // {moduleId: true}  펼침 상태 (첫 모듈은 기본 펼침)
+if(LEC_MODULES[0]) lecOpen[LEC_MODULES[0].id]=true;
+function lecUrl(lesson){ return lesson.url || LECTURES.courseUrl || "#"; }
+function allLessons(){ return LEC_MODULES.flatMap(m=>m.lessons||[]); }
 function renderLectureCard(){
-  const items=LECTURES.items||[]; if(!items.length){ $("lectureCard").style.display="none"; return; }
+  const lessons=allLessons(); if(!lessons.length){ $("lectureCard").style.display="none"; return; }
   $("lectureCard").style.display="flex";
-  const watched=store.lectures||{}; const done=items.filter(i=>watched[i.id]).length;
+  const watched=store.lectures||{}; const done=lessons.filter(l=>watched[l.id]).length;
   $("lectureCard").innerHTML=`
     <div class="meta"><div class="title">📺 강의 루틴</div>
-      <div class="desc">강의 보고 파트별로 시청 체크하기</div></div>
-    <div class="score"><div class="big">${done}/${items.length}</div><div class="lbl">시청 완료</div></div>`;
+      <div class="desc">강의 보고 레슨별로 시청 체크하기</div></div>
+    <div class="score"><div class="big">${done}/${lessons.length}</div><div class="lbl">시청 완료</div></div>`;
 }
 function openLectures(){
   $("goCourse").href=LECTURES.courseUrl||"#";
   show("lecturesView"); renderLectures();
 }
 function renderLectures(){
-  const items=LECTURES.items||[]; const watched=store.lectures||{};
+  const watched=store.lectures||{};
   const box=$("lecList"); box.innerHTML="";
-  items.forEach(item=>{
-    const on=!!watched[item.id];
-    const row=document.createElement("div"); row.className="lec-item";
-    row.innerHTML=`
-      <div class="lec-check ${on?'on':''}" data-id="${item.id}">${on?'✓':''}</div>
-      <div class="lec-body" data-id="${item.id}">
-        <div class="t ${on?'done':''}">${esc(item.title)}</div>
-        <div class="d">${esc(item.desc||'')}</div>
-      </div>
-      <a class="lec-go" href="${esc(lecUrl(item))}" target="_blank" rel="noopener">▶ 보기</a>`;
-    row.querySelector(".lec-check").onclick=()=>toggleLecture(item.id);
-    row.querySelector(".lec-body").onclick=()=>toggleLecture(item.id);
-    box.appendChild(row);
+  LEC_MODULES.forEach(mod=>{
+    const lessons=mod.lessons||[];
+    const mdone=lessons.filter(l=>watched[l.id]).length;
+    const open=!!lecOpen[mod.id];
+    const head=document.createElement("div");
+    head.className="lec-mod"+(open?" open":"");
+    head.innerHTML=`<div class="mt"><span class="arrow">▶</span> ${esc(mod.title)}</div>
+      <div class="mr">${mdone}/${lessons.length}</div>`;
+    head.onclick=()=>{ lecOpen[mod.id]=!open; renderLectures(); };
+    box.appendChild(head);
+    if(!open) return;
+    lessons.forEach(lesson=>{
+      const on=!!watched[lesson.id];
+      const row=document.createElement("div"); row.className="lec-item";
+      const meta=[lesson.tag?`<span class="lec-tag">${esc(lesson.tag)}</span>`:"", lesson.min?`<span class="lec-min">${esc(lesson.min)}</span>`:""].join("");
+      row.innerHTML=`
+        <div class="lec-check ${on?'on':''}" data-id="${lesson.id}">${on?'✓':''}</div>
+        <div class="lec-body" data-id="${lesson.id}">
+          <div class="t ${on?'done':''}">${esc(lesson.title)}</div>
+          <div class="d">${meta}</div>
+        </div>
+        <a class="lec-go" href="${esc(lecUrl(lesson))}" target="_blank" rel="noopener">▶ 보기</a>`;
+      row.querySelector(".lec-check").onclick=()=>toggleLecture(lesson.id);
+      row.querySelector(".lec-body").onclick=()=>toggleLecture(lesson.id);
+      box.appendChild(row);
+    });
   });
 }
 function toggleLecture(id){
