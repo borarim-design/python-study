@@ -1,0 +1,12 @@
+{
+  "name": "pyquiz-push-sender",
+  "version": "1.0.0",
+  "description": "파이썬 학습 퀴즈 매일 알림 발송기",
+  "private": true,
+  "scripts": {
+    "send": "node send-push.js"
+  },
+  "dependencies": {
+    "web-push": "^3.6.7"
+  }
+}

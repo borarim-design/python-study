@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>파이썬 학습 퀴즈</title>
+<meta name="theme-color" content="#7c3aed">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+<style>
+:root { color-scheme: light; }
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+  background: #f5f6f8; color: #1a1d24; line-height: 1.55;
+  padding: max(20px, env(safe-area-inset-top)) 16px calc(40px + env(safe-area-inset-bottom));
+}
+.wrap { max-width: 720px; margin: 0 auto; }
+header.top { margin-bottom: 16px; }
+h1 { font-size: 22px; font-weight: 700; letter-spacing: -0.02em; }
+.sub { color: #6b7280; font-size: 13px; margin-top: 4px; }
+.row { display:flex; gap:8px; flex-wrap:wrap; margin-top:12px; align-items:center; }
+.chip {
+  display: inline-flex; align-items: center; gap: 6px;
+  background: #fff7ed; color: #c2410c; border: 1px solid #fed7aa;
+  padding: 5px 12px; border-radius: 999px; font-size: 13px; font-weight: 600;
+}
+.mini-btn {
+  background:#fff; border:1px solid #e6e8ec; border-radius:999px; padding:6px 13px;
+  font-size:12.5px; font-weight:600; color:#374151; cursor:pointer; font-family:inherit;
+}
+.mini-btn:hover { border-color:#a855f7; color:#7c3aed; }
+.mini-btn.on { background:#ecfdf5; border-color:#a7f3d0; color:#059669; }
+
+.grid { display: grid; grid-template-columns: 1fr; gap: 12px; margin-top: 14px; }
+.card {
+  background: #fff; border: 1px solid #e6e8ec; border-radius: 14px;
+  padding: 16px 18px; cursor: pointer; transition: box-shadow .15s, transform .05s, border-color .15s;
+  display: flex; align-items: center; justify-content: space-between; gap: 14px;
+}
+.card:hover { box-shadow: 0 4px 16px rgba(20,25,40,.08); border-color: #c7cbd3; }
+.card:active { transform: translateY(1px); }
+.card .meta { flex: 1; min-width: 0; }
+.card .wk { font-size: 11px; font-weight: 700; color: #7c3aed; letter-spacing: .04em; text-transform: uppercase; }
+.card .title { font-size: 15.5px; font-weight: 650; margin-top: 2px; }
+.card .desc { font-size: 12.5px; color: #6b7280; margin-top: 3px; }
+.card .score { text-align: right; flex-shrink: 0; }
+.card .score .big { font-size: 18px; font-weight: 700; }
+.card .score .lbl { font-size: 11px; color: #9ca3af; }
+.bar { height: 6px; background: #eceef1; border-radius: 4px; overflow: hidden; margin-top: 10px; }
+.bar > i { display: block; height: 100%; background: linear-gradient(90deg,#7c3aed,#a855f7); width: 0; transition: width .4s; }
+.done-badge { color: #059669; font-size: 12px; font-weight: 700; }
+
+.add-card {
+  border: 1.5px dashed #cbd0d8; background:#fbfbfc; color:#7c3aed; text-align:center;
+  border-radius:14px; padding:14px; font-weight:650; font-size:14px; cursor:pointer;
+}
+.add-card:hover { border-color:#a855f7; background:#faf5ff; }
+
+.hidden { display: none !important; }
+.qhead { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+.back { background: none; border: none; color: #6b7280; font-size: 14px; cursor: pointer; padding: 4px 0; font-family:inherit;}
+.back:hover { color: #1a1d24; }
+.progress-txt { font-size: 13px; color: #6b7280; font-weight: 600; }
+
+.panel { background: #fff; border: 1px solid #e6e8ec; border-radius: 16px; padding: 22px 20px; }
+.qnum { font-size: 12px; font-weight: 700; color: #7c3aed; }
+.qtext { font-size: 16.5px; font-weight: 600; margin-top: 6px; white-space: pre-wrap; }
+pre.code {
+  background: #1e1e2e; color: #e4e4ef; border-radius: 10px; padding: 14px 16px;
+  font-family: "SF Mono", Menlo, Consolas, monospace; font-size: 13.5px;
+  margin-top: 12px; overflow-x: auto; line-height: 1.5; white-space: pre;
+}
+.opts { margin-top: 16px; display: flex; flex-direction: column; gap: 9px; }
+.opt {
+  text-align: left; background: #fafafb; border: 1.5px solid #e6e8ec; border-radius: 11px;
+  padding: 12px 15px; font-size: 14.5px; cursor: pointer; transition: all .12s;
+  font-family: inherit; color: #1a1d24; display: flex; align-items: center; gap: 10px;
+}
+.opt:hover:not(:disabled) { border-color: #a855f7; background: #faf5ff; }
+.opt:disabled { cursor: default; }
+.opt .key { font-weight: 700; color: #9ca3af; font-size: 13px; flex-shrink: 0; }
+.opt.correct { border-color: #059669; background: #ecfdf5; }
+.opt.wrong { border-color: #dc2626; background: #fef2f2; }
+.opt.correct .key { color: #059669; } .opt.wrong .key { color: #dc2626; }
+
+.explain { margin-top: 16px; padding: 14px 16px; border-radius: 11px; font-size: 14px;
+  background: #f0f9ff; border: 1px solid #bae6fd; color: #075985; display: none; }
+.explain.show { display: block; }
+.explain b { color: #0369a1; }
+
+.btn {
+  width: 100%; background: #7c3aed; color: #fff; border: none; padding: 13px; border-radius: 12px;
+  font-size: 15px; font-weight: 650; cursor: pointer; font-family: inherit; transition: background .15s;
+}
+.btn:hover { background: #6d28d9; }
+.btn:disabled { background: #d1d5db; cursor: not-allowed; }
+.btn.ghost { background:#fff; color:#374151; border:1.5px solid #e6e8ec; }
+.next-btn { margin-top:18px; }
+
+.result { text-align: center; }
+.result .emoji { font-size: 44px; }
+.result .rscore { font-size: 40px; font-weight: 800; margin: 8px 0 2px; letter-spacing: -.02em; }
+.result .rmsg { color: #6b7280; font-size: 15px; }
+.result .rbest { font-size: 13px; color: #9ca3af; margin-top: 8px; }
+.result .actions { display: flex; gap: 10px; margin-top: 24px; }
+.result .actions .btn { flex:1; }
+
+label.fld { display:block; font-size:13px; font-weight:650; color:#374151; margin:14px 0 5px; }
+input.txt, textarea.txt {
+  width:100%; border:1.5px solid #e6e8ec; border-radius:10px; padding:10px 12px;
+  font-size:14px; font-family:inherit; color:#1a1d24; background:#fff;
+}
+textarea.txt { resize:vertical; min-height:52px; }
+.opt-row { display:flex; align-items:center; gap:8px; margin-top:8px; }
+.opt-row input[type=radio] { width:18px; height:18px; accent-color:#7c3aed; flex-shrink:0; }
+.opt-row input.txt { flex:1; }
+.hint { font-size:12px; color:#9ca3af; margin-top:6px; }
+.toast {
+  position: fixed; left:50%; bottom:24px; transform:translateX(-50%);
+  background:#1a1d24; color:#fff; padding:11px 18px; border-radius:999px; font-size:13.5px;
+  opacity:0; transition:opacity .2s, transform .2s; pointer-events:none; z-index:50; max-width:90%;
+}
+.toast.show { opacity:1; transform:translateX(-50%) translateY(-4px); }
+footer { text-align: center; color: #9ca3af; font-size: 12px; margin-top: 26px; }
+.reset-all { background:none;border:none;color:#c1c5cd;font-size:11.5px;cursor:pointer;text-decoration:underline; }
+.subbox { margin-top:12px; }
+.subbox textarea { width:100%; height:88px; font-family:"SF Mono",Menlo,monospace; font-size:11px;
+  border:1.5px solid #e6e8ec; border-radius:10px; padding:10px; color:#374151; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- DASHBOARD -->
+  <div id="dashboard">
+    <header class="top">
+      <h1>파이썬 학습 퀴즈 🐍</h1>
+      <div class="sub">AI Python for Beginners + FDE 브릿지</div>
+      <div class="row">
+        <span class="chip" id="streakChip">🔥 오늘 시작해보세요</span>
+        <button class="mini-btn" id="notifyBtn">🔔 매일 알림 켜기</button>
+        <button class="mini-btn hidden" id="installBtn">⬇️ 앱 설치</button>
+      </div>
+    </header>
+    <div class="grid" id="sectionGrid"></div>
+    <div class="add-card" id="addCard" style="margin-top:12px;">＋ 내 문제 추가하기</div>
+    <footer>
+      풀 때마다 최고 점수·연속일이 저장돼요 · <button class="reset-all" id="resetBtn">기록 초기화</button>
+    </footer>
+  </div>
+
+  <!-- QUIZ -->
+  <div id="quiz" class="hidden">
+    <div class="qhead"><button class="back" id="backBtn">← 목록으로</button><span class="progress-txt" id="progTxt"></span></div>
+    <div class="panel" id="qcard"></div>
+  </div>
+
+  <!-- RESULT -->
+  <div id="resultView" class="hidden"></div>
+
+  <!-- ADD QUESTION -->
+  <div id="addView" class="hidden">
+    <div class="qhead"><button class="back" id="backBtn3">← 목록으로</button><span class="progress-txt">내 문제 추가</span></div>
+    <div class="panel">
+      <label class="fld">어느 섹션에 넣을까요?</label>
+      <select id="secSel" class="txt"></select>
+      <label class="fld">문제 지문</label>
+      <textarea class="txt" id="fQ" placeholder="예: len(&quot;hi&quot;) 의 값은?"></textarea>
+      <label class="fld">코드 (선택 — 없으면 비워두세요)</label>
+      <textarea class="txt" id="fCode" placeholder="예: print(len(&quot;hi&quot;))"></textarea>
+      <label class="fld">보기 (정답에 체크)</label>
+      <div id="optRows"></div>
+      <label class="fld">해설</label>
+      <textarea class="txt" id="fE" placeholder="정답을 고르면 보여줄 설명"></textarea>
+      <button class="btn" id="saveQ" style="margin-top:18px;">저장하기</button>
+      <p class="hint">저장한 문제는 이 폰에 보관돼요. 여러 기기에서 공유하려면 content.js 파일에 직접 추가하면 됩니다.</p>
+    </div>
+  </div>
+
+  <!-- NOTIFY SETUP -->
+  <div id="notifyView" class="hidden">
+    <div class="qhead"><button class="back" id="backBtn4">← 목록으로</button><span class="progress-txt">매일 알림 설정</span></div>
+    <div class="panel">
+      <div class="qtext" style="font-size:16px;">🔔 매일 밤 9시 학습 알림</div>
+      <p class="hint" style="margin-top:10px; line-height:1.6;">
+        아래 버튼을 눌러 알림을 허용하면 <b>구독 정보</b>가 만들어져요.
+        이 정보를 GitHub 저장소의 <b>PUSH_SUBSCRIPTION</b> 시크릿에 붙여넣으면
+        매일 밤 9시에 알림이 옵니다. (그날 퀴즈를 다 풀었으면 알림은 건너뜁니다.)
+        자세한 방법은 함께 드린 <b>README.md</b>를 보세요.
+      </p>
+      <button class="btn" id="enableNotify" style="margin-top:16px;">알림 허용하고 구독 만들기</button>
+      <div class="subbox hidden" id="subBox">
+        <label class="fld">내 구독 정보 (복사해서 GitHub 시크릿에 붙여넣기)</label>
+        <textarea id="subText" readonly></textarea>
+        <button class="btn ghost" id="copySub" style="margin-top:8px;">📋 구독 정보 복사</button>
+      </div>
+    </div>
+  </div>
+
+</div>
+<div class="toast" id="toast"></div>
+
+<script src="content.js"></script>
+<script>
+// ====== 설정 ======
+const VAPID_PUBLIC_KEY = "BIEqpiL2lC_xunEm3Ppu7ZPEnz3OHTX9-yGLDv9ElYQzyFC9TXqL6-2QjzUJWzagQh7gHRf5r8LPZznEL1Hf1Gs";
+
+const $ = id => document.getElementById(id);
+function toast(msg){ const t=$("toast"); t.textContent=msg; t.classList.add("show"); setTimeout(()=>t.classList.remove("show"),2200); }
+function todayStr(){ const d=new Date(); return d.getFullYear()+"-"+(d.getMonth()+1)+"-"+d.getDate(); }
+function esc(s){ return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
+
+// ====== IndexedDB (서비스워커와 공유: '오늘 학습했나' 저장) ======
+function idbOpen(){ return new Promise((res,rej)=>{ const r=indexedDB.open("pyquiz",1);
+  r.onupgradeneeded=()=>r.result.createObjectStore("kv"); r.onsuccess=()=>res(r.result); r.onerror=()=>rej(r.error); }); }
+async function idbSet(k,v){ const db=await idbOpen(); return new Promise((res,rej)=>{ const tx=db.transaction("kv","readwrite"); tx.objectStore("kv").put(v,k); tx.oncomplete=()=>res(); tx.onerror=()=>rej(tx.error); }); }
+
+// ====== localStorage 상태 ======
+const STORE_KEY="pyquiz_v1", CUSTOM_KEY="pyquiz_custom_v1";
+function loadStore(){ try{return JSON.parse(localStorage.getItem(STORE_KEY))||{};}catch(e){return {};} }
+function saveStore(s){ try{localStorage.setItem(STORE_KEY,JSON.stringify(s));}catch(e){} }
+function loadCustom(){ try{return JSON.parse(localStorage.getItem(CUSTOM_KEY))||{};}catch(e){return {};} }
+function saveCustom(c){ try{localStorage.setItem(CUSTOM_KEY,JSON.stringify(c));}catch(e){} }
+let store=loadStore();
+
+// ====== 섹션 = 기본 콘텐츠 + 내가 추가한 문제 ======
+function buildSections(){
+  const base=(window.QUIZ_CONTENT||[]).map(s=>({...s, questions:[...s.questions]}));
+  const custom=loadCustom(); // { sectionId: [q,...] }  또는 { "_new_제목": {meta, questions} }
+  Object.keys(custom).forEach(k=>{
+    const entry=custom[k];
+    const found=base.find(s=>s.id===k);
+    if(found){ found.questions=found.questions.concat(entry); }
+    else if(entry.__meta){ base.push({ id:k, week:"내가 추가", title:entry.__meta.title, desc:"직접 추가한 문제", questions:entry.questions }); }
+  });
+  return base;
+}
+let SECTIONS=buildSections();
+
+// ====== 대시보드 ======
+function renderDashboard(){
+  SECTIONS=buildSections();
+  const streak=store.streak||0;
+  $("streakChip").textContent = streak>0 ? `🔥 ${streak}일 연속!` : "🔥 오늘 시작해보세요";
+  const grid=$("sectionGrid"); grid.innerHTML="";
+  SECTIONS.forEach(sec=>{
+    const best=(store.best&&store.best[sec.id])||0, pct=Math.round(best*100), done=best>=0.999;
+    const el=document.createElement("div"); el.className="card";
+    el.innerHTML=`<div class="meta">
+        <div class="wk">${esc(sec.week)}</div>
+        <div class="title">${esc(sec.title)} ${done?'<span class="done-badge">✓ 만점</span>':''}</div>
+        <div class="desc">${esc(sec.desc)} · ${sec.questions.length}문제</div>
+        <div class="bar"><i style="width:${pct}%"></i></div></div>
+      <div class="score"><div class="big">${pct}%</div><div class="lbl">${best>0?'최고점':'미도전'}</div></div>`;
+    el.onclick=()=>startQuiz(sec.id);
+    grid.appendChild(el);
+  });
+}
+
+// ====== 퀴즈 흐름 ======
+let cur=null;
+function show(view){ ["dashboard","quiz","resultView","addView","notifyView"].forEach(v=>$(v).classList.toggle("hidden",v!==view)); }
+function startQuiz(secId){
+  const sec=SECTIONS.find(s=>s.id===secId); if(!sec||!sec.questions.length){ toast("문제가 없어요"); return; }
+  cur={sec,idx:0,correct:0,answered:false}; show("quiz"); renderQuestion();
+}
+function renderQuestion(){
+  const {sec,idx}=cur, q=sec.questions[idx]; cur.answered=false;
+  $("progTxt").textContent=`${sec.title} · ${idx+1} / ${sec.questions.length}`;
+  const keys=["A","B","C","D","E"];
+  const codeHtml=q.code?`<pre class="code">${esc(q.code)}</pre>`:"";
+  const optsHtml=q.opts.map((o,i)=>`<button class="opt" data-i="${i}"><span class="key">${keys[i]}</span><span>${esc(o)}</span></button>`).join("");
+  $("qcard").innerHTML=`<div class="qnum">문제 ${idx+1}</div><div class="qtext">${esc(q.q)}</div>${codeHtml}
+    <div class="opts">${optsHtml}</div><div class="explain" id="explain"></div>
+    <button class="btn next-btn" id="nextBtn" disabled>답을 선택하세요</button>`;
+  $("qcard").querySelectorAll(".opt").forEach(b=>b.onclick=()=>choose(parseInt(b.dataset.i)));
+  $("nextBtn").onclick=nextQuestion;
+}
+function choose(i){
+  if(cur.answered)return; cur.answered=true;
+  const q=cur.sec.questions[cur.idx], opts=$("qcard").querySelectorAll(".opt");
+  opts.forEach((b,bi)=>{ b.disabled=true; if(bi===q.a)b.classList.add("correct"); if(bi===i&&i!==q.a)b.classList.add("wrong"); });
+  if(i===q.a)cur.correct++;
+  const ex=$("explain"); ex.innerHTML=(i===q.a?"<b>정답이에요! 🎉</b> ":"<b>아쉬워요.</b> ")+esc(q.e); ex.classList.add("show");
+  const nb=$("nextBtn"); nb.disabled=false; nb.textContent=(cur.idx===cur.sec.questions.length-1)?"결과 보기 →":"다음 문제 →";
+}
+function nextQuestion(){ if(cur.idx<cur.sec.questions.length-1){cur.idx++;renderQuestion();} else showResult(); }
+async function markStudiedToday(){
+  const t=todayStr();
+  // 스트릭
+  const y=new Date(); y.setDate(y.getDate()-1); const yStr=y.getFullYear()+"-"+(y.getMonth()+1)+"-"+y.getDate();
+  if(store.lastDay!==t){ store.streak=(store.lastDay===yStr)?(store.streak||0)+1:1; store.lastDay=t; }
+  saveStore(store);
+  try{ await idbSet("lastStudied", t); }catch(e){}
+}
+function showResult(){
+  const {sec,correct}=cur, total=sec.questions.length, ratio=correct/total;
+  markStudiedToday();
+  store.best=store.best||{}; const prev=store.best[sec.id]||0, newBest=ratio>prev;
+  if(newBest)store.best[sec.id]=ratio; saveStore(store);
+  let emoji,msg;
+  if(ratio===1){emoji="🏆";msg="완벽해요! 이 섹션 마스터!";}
+  else if(ratio>=.7){emoji="👏";msg="잘했어요! 거의 다 왔어요.";}
+  else if(ratio>=.4){emoji="💪";msg="좋은 출발! 해설 보고 다시 도전!";}
+  else{emoji="🌱";msg="괜찮아요, 처음엔 다 그래요. 다시!";}
+  show("resultView");
+  $("resultView").innerHTML=`<div class="qhead"><button class="back" id="backBtn2">← 목록으로</button><span class="progress-txt">${esc(sec.title)}</span></div>
+    <div class="panel result"><div class="emoji">${emoji}</div><div class="rscore">${correct} / ${total}</div>
+      <div class="rmsg">${msg}</div>
+      <div class="rbest">${newBest?"🎯 새로운 최고 기록!":"최고 기록: "+Math.round(prev*100)+"%"}</div>
+      <div class="actions"><button class="btn ghost" id="retryBtn">다시 풀기</button><button class="btn" id="homeBtn">목록으로</button></div></div>`;
+  $("backBtn2").onclick=goHome; $("homeBtn").onclick=goHome; $("retryBtn").onclick=()=>startQuiz(sec.id);
+}
+function goHome(){ show("dashboard"); renderDashboard(); }
+
+// ====== 내 문제 추가 ======
+function openAdd(){
+  const sel=$("secSel"); sel.innerHTML="";
+  buildSections().forEach(s=>{ const o=document.createElement("option"); o.value=s.id; o.textContent=s.title; sel.appendChild(o); });
+  const o=document.createElement("option"); o.value="__new"; o.textContent="＋ 새 섹션 만들기"; sel.appendChild(o);
+  $("fQ").value=""; $("fCode").value=""; $("fE").value="";
+  const rows=$("optRows"); rows.innerHTML="";
+  for(let i=0;i<4;i++){
+    const div=document.createElement("div"); div.className="opt-row";
+    div.innerHTML=`<input type="radio" name="correct" value="${i}" ${i===0?"checked":""}><input class="txt optIn" placeholder="보기 ${["A","B","C","D"][i]}">`;
+    rows.appendChild(div);
+  }
+  show("addView");
+}
+$("saveQ").onclick=()=>{
+  const q=$("fQ").value.trim(); if(!q){toast("문제 지문을 입력하세요");return;}
+  const opts=[...document.querySelectorAll(".optIn")].map(i=>i.value.trim()).filter(v=>v);
+  if(opts.length<2){toast("보기를 2개 이상 입력하세요");return;}
+  const aRaw=parseInt(document.querySelector('input[name=correct]:checked').value);
+  if(aRaw>=opts.length){toast("정답으로 체크한 보기가 비어 있어요");return;}
+  const item={q, opts, a:aRaw, e:$("fE").value.trim()||"직접 추가한 문제입니다."};
+  const code=$("fCode").value.trim(); if(code)item.code=code;
+  const custom=loadCustom(); let target=$("secSel").value;
+  if(target==="__new"){ const title=prompt("새 섹션 이름을 정해주세요","내 복습 문제"); if(!title)return;
+    const nid="u_"+Date.now(); custom[nid]={__meta:{title}, questions:[item]}; }
+  else { if(!custom[target])custom[target]=[]; if(custom[target].__meta)custom[target].questions.push(item); else custom[target].push(item); }
+  saveCustom(custom); toast("문제가 저장됐어요 ✅"); goHome();
+};
+
+// ====== 알림 / 푸시 구독 ======
+function urlB64ToUint8Array(b64){
+  const pad="=".repeat((4-b64.length%4)%4);
+  const base=(b64+pad).replace(/-/g,"+").replace(/_/g,"/");
+  const raw=atob(base); return Uint8Array.from([...raw].map(c=>c.charCodeAt(0)));
+}
+async function enableNotifications(){
+  if(!("serviceWorker" in navigator)||!("PushManager" in window)){ toast("이 브라우저는 푸시를 지원하지 않아요"); return; }
+  const perm=await Notification.requestPermission();
+  if(perm!=="granted"){ toast("알림이 거부되었어요. 브라우저 설정에서 허용해주세요"); return; }
+  const reg=await navigator.serviceWorker.ready;
+  let sub=await reg.pushManager.getSubscription();
+  if(!sub){ sub=await reg.pushManager.subscribe({ userVisibleOnly:true, applicationServerKey:urlB64ToUint8Array(VAPID_PUBLIC_KEY) }); }
+  $("subText").value=JSON.stringify(sub); $("subBox").classList.remove("hidden");
+  $("notifyBtn").classList.add("on"); $("notifyBtn").textContent="🔔 알림 켜짐";
+  toast("구독이 만들어졌어요! 아래 정보를 복사하세요");
+}
+$("enableNotify").onclick=enableNotifications;
+$("copySub").onclick=async()=>{ try{ await navigator.clipboard.writeText($("subText").value); toast("복사됐어요 📋"); }
+  catch(e){ $("subText").select(); document.execCommand("copy"); toast("복사됐어요 📋"); } };
+
+// ====== 앱 설치 프롬프트 ======
+let deferredPrompt=null;
+window.addEventListener("beforeinstallprompt",e=>{ e.preventDefault(); deferredPrompt=e; $("installBtn").classList.remove("hidden"); });
+$("installBtn").onclick=async()=>{ if(!deferredPrompt)return; deferredPrompt.prompt(); await deferredPrompt.userChoice; deferredPrompt=null; $("installBtn").classList.add("hidden"); };
+window.addEventListener("appinstalled",()=>$("installBtn").classList.add("hidden"));
+
+// ====== 네비게이션 ======
+$("backBtn").onclick=goHome; $("backBtn3").onclick=goHome; $("backBtn4").onclick=goHome;
+$("addCard").onclick=openAdd;
+$("notifyBtn").onclick=()=>show("notifyView");
+$("resetBtn").onclick=()=>{ if(confirm("모든 학습 기록을 지울까요? (추가한 문제는 유지돼요)")){ store={}; saveStore(store); renderDashboard(); } };
+
+// ====== 서비스워커 등록 ======
+if("serviceWorker" in navigator){ window.addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{})); }
+if(Notification.permission==="granted"){ $("notifyBtn").classList.add("on"); $("notifyBtn").textContent="🔔 알림 켜짐"; }
+
+renderDashboard();
+</script>
+</body>
+</html>
